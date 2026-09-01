@@ -1,10 +1,9 @@
-const CACHE_NAME = '6gorodov-v1';
+const CACHE_NAME = '6gorodov-v3';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/manifest.json',
-  '/icon-192.png',
-  '/icon-512.png'
+  '/6-towns/',
+  '/6-towns/index.html',
+  '/6-towns/manifest.json',
+  '/6-towns/icon-192-new.png'
 ];
 
 self.addEventListener('install', event => {
@@ -22,19 +21,14 @@ self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        if (response) {
-          return response;
-        }
-        return fetch(event.request)
-          .catch(() => {
-            // Можно вернуть страницу-заглушку
-          });
+        if (response) return response;
+        return fetch(event.request).catch(() => {});
       })
   );
 });
 
 self.addEventListener('activate', event => {
-  const cacheWhitelist = ['6gorodov-v1'];
+  const cacheWhitelist = ['6gorodov-v3'];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
