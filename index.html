@@ -1,12 +1,14 @@
-Сергей Исаев, [31.08.2026 16:55]
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>6 городов</title>
+    <title>6 городов — Путь проб</title>
 
-    <!-- Метатеги для PWA -->
+    <!-- Подключение шрифтовых иконок FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- PWA метатеги -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="6 городов">
@@ -15,378 +17,329 @@
     <meta name="theme-color" content="#2c3e50">
 
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: system-ui, -apple-system, sans-serif;
-        }
         body {
-            background: #f5f0eb;
-            height: 100vh;
+            background-color: #e0e0e0;
             display: flex;
-            flex-direction: column;
-            color: #2c3e50;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-        /* Шапка */
-        .header {
-            background: white;
-            padding: 12px 16px;
+        /* Корпус телефона */
+        .phone {
+            width: 375px;
+            height: 812px;
+            background: #ffffff;
+            border: 12px solid #111;
+            border-radius: 40px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        /* Статус бар */
+        .status-bar {
+            position: absolute;
+            top: 0;
+            width: 100%;
+            height: 40px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid #e0dbd5;
-            flex-shrink: 0;
+            padding: 0 20px;
+            box-sizing: border-box;
+            font-size: 14px;
+            font-weight: 500;
+            color: #000;
+            z-index: 10;
         }
-        .header h1 {
-            font-size: 20px;
+        .notch {
+            position: absolute;
+            top: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 120px;
+            height: 25px;
+            background: #000;
+            border-radius: 20px;
+            z-index: 11;
+        }
+
+        /* Карта (имитация градиента) */
+        .map-area {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 55%;
+            background: linear-gradient(to bottom, #a3c293 0%, #d3e0c5 40%, #a0c9e8 60%, #77aad9 100%);
+            z-index: 1;
+        }
+        
+        /* Элементы на карте (абсолютное позиционирование для стилизации) */
+        .card-detail { position: absolute; font-size: 12px; font-weight: 700; text-shadow: 1px 1px 0 #fff; }
+        .map-icon { position: absolute; font-size: 20px; color: #333; z-index: 3; }
+        .red-pin { position: absolute; color: #e74c3c; z-index: 3; }
+        .blue-user { position: absolute; color: #3498db; z-index: 3; }
+        .route-line {
+            position: absolute;
+            top: 25%;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: #c0392b;
+            transform: rotate(-10deg);
+            z-index: 2;
+            border-radius: 5px;
+            opacity: 0.8;
+        }
+        
+        /* Поиск и меню */
+        .top-controls {
+            position: absolute;
+            top: 50px;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        .circle-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 18px;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        .search-pill {
+            flex: 1;
+            height: 40px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.6);
+            display: flex;
+            align-items: center;
+
+Сергей Исаев, [01.09.2026 20:59]
+padding-left: 15px;
+            color: #888;
+            font-size: 16px;
+        }
+
+        /* Кнопки Слои и GPS на карте */
+        .map-controls {
+            position: absolute;
+            bottom: 25%;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 20px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+
+        /* Карточки информации */
+        .info-cards {
+            position: absolute;
+            bottom: 15%;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 10;
+        }
+        .card {
+            background: rgba(210, 180, 140, 0.8); /* Бежевый с прозрачностью */
+            border-radius: 15px;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 600;
+            font-size: 18px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .card:first-child {
+            background: rgba(205, 170, 125, 0.95);
             font-weight: 700;
         }
-        .header h1 span {
-            color: #7b9e87;
-        }
-        .header .menu-btn {
-            font-size: 24px;
-            background: none;
-            border: none;
-            cursor: pointer;
-            color: #2c3e50;
-        }
-
-        /* Основная область */
-        .main {
-            flex: 1;
-            overflow-y: auto;
-            padding: 16px;
-        }
-
-        /* Вкладки (экраны) */
-        .screen {
-            display: none;
-        }
-        .screen.active {
-            display: block;
-        }
-
-        /* Карточка города (для маршрута) */
-        .city-card {
-            background: white;
-            border-radius: 12px;
-            padding: 14px 16px;
-            margin-bottom: 10px;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .city-card .info {
-            display: flex;
-            flex-direction: column;
-        }
-        .city-card .name {
-            font-weight: 600;
-        }
-        .city-card .date {
-            font-size: 13px;
-            color: #7f8c8d;
-        }
-        .city-card .status {
-            font-size: 13px;
-            font-weight: 500;
-            color: #27ae60;
-        }
-
-        /* Активности (сетка) */
-        .activities-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .activity-item {
-            background: white;
-            border-radius: 12px;
-            padding: 14px;
-            text-align: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
-        }
-        .activity-item .emoji {
-            font-size: 28px;
-        }
-        .activity-item .name {
-            font-weight: 500;
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        /* Профиль */
-        .profile-card {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 16px;
-        }
-        .profile-card .avatar {
-            font-size: 48px;
-        }
-        .profile-card .name {
-            font-weight: 600;
-            font-size: 18px;
-            margin: 8px 0 4px;
-        }
-        .profile-card .email {
-            color: #7f8c8d;
-            font-size: 14px;
-        }
-        .sos-btn {
-            background: #d48c6a;
-            color: white;
-            border: none;
-            padding: 14px;
-            border-radius: 30px;
-            font-size: 18px;
-            font-weight: 600;
-            width: 100%;
-            cursor: pointer;
+        .card i {
+            font-size: 20px;
         }
 
         /* Нижняя навигация */
-        .bottom-nav {
+        .bottom-nav-container {
+            position: absolute;
+            bottom: 15px;
+            width: 100%;
             display: flex;
-
-Сергей Исаев, [31.08.2026 16:55]
-justify-content: space-around;
-            background: white;
-            padding: 8px 0 10px;
-            border-top: 1px solid #e0dbd5;
-            flex-shrink: 0;
+            align-items: flex-end;
+            justify-content: space-between;
+            padding: 0 15px;
+            box-sizing: border-box;
+            z-index: 10;
         }
-        .bottom-nav button {
-            background: none;
-            border: none;
+        .nav-pill {
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: 30px;
+            padding: 10px 15px;
+            display: flex;
+            gap: 15px;
+            backdrop-filter: blur(5px);
+        }
+        .nav-item {
             display: flex;
             flex-direction: column;
             align-items: center;
-            font-size: 11px;
-            color: #95a5a6;
+            font-size: 10px;
+            color: #555;
+            gap: 5px;
             cursor: pointer;
-            padding: 4px 12px;
         }
-        .bottom-nav button .icon {
+        .nav-item i {
+            font-size: 18px;
+            color: #555;
+        }
+        .nav-item.active {
+            color: #007bff;
+        }
+        .nav-item.active i {
+            color: #007bff;
+        }
+        .nav-divider {
+            width: 1px;
+            background: #ccc;
+            align-self: stretch;
+        }
+        .search-circle-bottom {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 22px;
-            line-height: 1.2;
-        }
-        .bottom-nav button.active {
-            color: #2c3e50;
-            font-weight: 500;
-        }
-        .bottom-nav button.active .icon {
-            color: #7b9e87;
-        }
-
-        /* Заголовки экранов */
-        .page-title {
-            font-size: 22px;
-            font-weight: 700;
-            margin-bottom: 16px;
+            color: #333;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
-    <!-- ШАПКА -->
-    <header class="header">
-        <div>
-            <span class="menu-btn" id="menuBtn">☰</span>
+<div class="phone">
+    <div class="notch"></div>
+    
+    <!-- Карта -->
+    <div class="map-area">
+        <div class="route-line"></div>
+        <div class="card-detail" style="top: 20%; left: 5%;">Красный Берег</div>
+        <div class="card-detail" style="top: 30%; left: 55%;">Солнечное</div>
+        <div class="card-detail" style="top: 65%; left: 30%;">Тихая Пристань</div>
+        
+        <div class="map-icon" style="top: 18%; left: 45%;"><i class="fa-solid fa-house"></i></div>
+        <div class="map-icon" style="top: 38%; left: 25%;"><i class="fa-solid fa-bed"></i></div>
+        <div class="map-icon" style="top: 35%; left: 80%;"><i class="fa-solid fa-palette"></i></div>
+        
+        <div class="red-pin" style="top: 40%; left: 50%; font-size: 25px;"><i class="fa-solid fa-location-dot"></i></div>
+        <div class="blue-user" style="top: 50%; left: 45%; font-size: 25px;"><i class="fa-solid fa-person"></i></div>
+    </div>
+
+    <!-- Статус бар -->
+    <div class="status-bar">
+        <span>10:09 AM</span>
+        <span>85% <i class="fa-solid fa-wifi"></i> <i class="fa-solid fa-battery-full"></i></span>
+    </div>
+
+    <!-- Верхние контролы -->
+    <div class="top-controls">
+
+Сергей Исаев, [01.09.2026 20:59]
+<div class="circle-btn"><i class="fa-solid fa-bars"></i></div>
+        <div class="search-pill">ПОИСК...</div>
+    </div>
+
+    <!-- Нижние контролы карты -->
+    <div class="map-controls">
+        <div class="circle-btn"><i class="fa-solid fa-layer-group"></i></div>
+        <div class="circle-btn"><i class="fa-solid fa-location-arrow"></i></div>
+    </div>
+
+    <!-- Карточки -->
+    <div class="info-cards">
+        <div class="card">
+            <span>Погода</span>
+            <span>23°C <i class="fa-regular fa-sun"></i></span>
         </div>
-        <h1>6 <span>городов</span></h1>
-        <div style="width: 30px;"></div> <!-- пустой блок для баланса -->
-    </header>
-
-    <!-- ОСНОВНАЯ ОБЛАСТЬ -->
-    <div class="main" id="mainContent">
-
-        <!-- ЭКРАН: КАРТА -->
-        <div class="screen active" id="screen-map">
-            <div class="page-title">🗺️ Карта</div>
-            <p style="color: #7f8c8d; margin-bottom: 16px;">Здесь будет интерактивная карта маршрута (120 км, 6 городов).</p>
-            <div style="background: #e0dbd5; height: 200px; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: #7f8c8d;">Карта (заглушка)</div>
+        <div class="card">
+            <span>До пункта отдыха</span>
+            <span>2 км</span>
         </div>
-
-        <!-- ЭКРАН: МАРШРУТ -->
-        <div class="screen" id="screen-route">
-            <div class="page-title">📋 Мой маршрут</div>
-            <div id="routeList"></div>
+        <div class="card">
+            <span>До города</span>
+            <span>12 км</span>
         </div>
-
-        <!-- ЭКРАН: АКТИВНОСТИ -->
-        <div class="screen" id="screen-activities">
-            <div class="page-title">⭐ Активности</div>
-            <div class="activities-grid" id="activitiesGrid"></div>
-        </div>
-
-        <!-- ЭКРАН: ПАСПОРТ -->
-        <div class="screen" id="screen-passport">
-            <div class="page-title">🎯 Паспорт</div>
-            <div style="background: white; border-radius: 12px; padding: 20px; display: flex; justify-content: space-around; margin-bottom: 16px;">
-                <div><strong id="kmPassed">0</strong><br><span style="font-size:13px; color:#7f8c8d;">км</span></div>
-                <div><strong id="citiesPassed">0</strong><br><span style="font-size:13px; color:#7f8c8d;">городов</span></div>
-                <div><strong id="daysPassed">0</strong><br><span style="font-size:13px; color:#7f8c8d;">дней</span></div>
-            </div>
-            <div style="font-weight: 600; margin-bottom: 8px;">🏅 Достижения</div>
-            <div id="badgesContainer" style="display: flex; flex-wrap: wrap; gap: 8px;">
-                <span style="background: white; padding: 6px 14px; border-radius: 30px;">🎨 Мурал</span>
-                <span style="background: white; padding: 6px 14px; border-radius: 30px;">🤖 Робот</span>
-                <span style="background: white; padding: 6px 14px; border-radius: 30px;">🍳 Шеф</span>
-            </div>
-        </div>
-
-        <!-- ЭКРАН: ПРОФИЛЬ -->
-        <div class="screen" id="screen-profile">
-            <div class="page-title">👤 Профиль</div>
-            <div class="profile-card">
-                <div class="avatar">🧑</div>
-                <div class="name">Путешественник</div>
-                <div class="email">user@6gorodov.com</div>
-            </div>
-            <div style="background: white; border-radius: 12px; padding: 12px 0; margin-bottom: 16px;">
-                <div style="padding: 12px 16px; border-bottom: 1px solid #f0ebe6;">Язык: Русский</div>
-                <div style="padding: 12px 16px; border-bottom: 1px solid #f0ebe6;">Уведомления: Вкл</div>
-
-Сергей Исаев, [31.08.2026 16:55]
-<div style="padding: 12px 16px;">Тёмная тема: Выкл</div>
-            </div>
-            <button class="sos-btn" id="sosBtn">🆘 SOS</button>
+        <div class="card">
+            <span>На пути</span>
+            <span style="display: flex; gap: 10px;">
+                <i class="fa-solid fa-building-columns"></i>
+                <i class="fa-solid fa-tower-observation"></i>
+                <i class="fa-solid fa-archway"></i>
+            </span>
         </div>
     </div>
 
-    <!-- НИЖНЯЯ НАВИГАЦИЯ -->
-    <nav class="bottom-nav" id="bottomNav">
-        <button class="active" data-screen="screen-map"><span class="icon">🗺️</span> Карта</button>
-        <button data-screen="screen-route"><span class="icon">📋</span> Маршрут</button>
-        <button data-screen="screen-activities"><span class="icon">⭐</span> Активности</button>
-        <button data-screen="screen-passport"><span class="icon">🎯</span> Паспорт</button>
-        <button data-screen="screen-profile"><span class="icon">👤</span> Профиль</button>
-    </nav>
+    <!-- Нижняя навигация -->
+    <div class="bottom-nav-container">
+        <div class="nav-pill">
+            <div class="nav-item active">
+                <i class="fa-regular fa-map"></i>
+                <span>КАРТА</span>
+            </div>
+            <div class="nav-divider"></div>
+            <div class="nav-item">
+                <i class="fa-solid fa-route"></i>
+                <span>Мой маршрут</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-person-running"></i>
+                <span>Activities</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-id-card"></i>
+                <span>Паспорт</span>
+            </div>
+            <div class="nav-item">
+                <i class="fa-solid fa-gear"></i>
+                <span>Настройки</span>
+            </div>
+        </div>
+        <div class="search-circle-bottom">
+            <i class="fa-solid fa-magnifying-glass"></i>
+        </div>
+    </div>
+</div>
 
-    <!-- Service Worker регистрация -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('SW зарегистрирован'))
-                    .catch(err => console.error('Ошибка SW:', err));
-            });
-        }
-    </script>
-
-    <!-- ОСНОВНОЙ JS -->
-    <script>
-        // ======= ДАННЫЕ =======
-        const cities = [
-            { name: 'Город Искусства', icon: '🎭', date: '1–2 июня', status: 'Активно' },
-            { name: 'Город Науки', icon: '🔬', date: '3–4 июня', status: 'Забронирован' },
-            { name: 'Город Стиля', icon: '👔', date: '5–6 июня', status: 'Забронирован' },
-            { name: 'Город Культур', icon: '🍲', date: '7–8 июня', status: 'Ожидает' },
-            { name: 'Город Спорта', icon: '🏃', date: '9–10 июня', status: 'Ожидает' },
-            { name: 'Город Отдыха', icon: '🌿', date: '11–12 июня', status: 'Ожидает' }
-        ];
-
-        const activities = [
-            { emoji: '🎨', name: 'Стрит-арт' },
-            { emoji: '🤖', name: 'Роботы' },
-            { emoji: '👔', name: 'Стиль' },
-            { emoji: '🍳', name: 'Гастрономия' },
-            { emoji: '🧗', name: 'Скалодром' },
-            { emoji: '🌊', name: 'Сап-сёрфинг' }
-        ];
-
-        // ======= ОТРИСОВКА МАРШРУТА =======
-        function renderRoute() {
-            const container = document.getElementById('routeList');
-            container.innerHTML = '';
-            cities.forEach(c => {
-                const card = document.createElement('div');
-                card.className = 'city-card';
-                card.innerHTML = `
-                    <div class="info">
-                        <div class="name">${c.icon} ${c.name}</div>
-                        <div class="date">${c.date}</div>
-                        <div class="status">${c.status}</div>
-                    </div>
-                    <button style="background:#f0ebe6; border:none; padding:6px 12px; border-radius:20px; font-size:13px; cursor:pointer;">Подробнее</button>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // ======= АКТИВНОСТИ =======
-        function renderActivities() {
-            const grid = document.getElementById('activitiesGrid');
-            grid.innerHTML = '';
-            activities.forEach(a => {
-                const div = document.createElement('div');
-                div.className = 'activity-item';
-                div.innerHTML = `
-                    <div class="emoji">${a.emoji}</div>
-                    <div class="name">${a.name}</div>
-                `;
-                grid.appendChild(div);
-            });
-        }
-
-        // ======= ПАСПОРТ (случайные цифры для демо) =======
-        function updatePassport() {
-            document.getElementById('kmPassed').textContent = Math.floor(Math.random() * 40 + 20);
-            document.getElementById('citiesPassed').textContent = Math.floor(Math.random() * 3 + 1);
-            document.getElementById('daysPassed').textContent = Math.floor(Math.random() * 5 + 1);
-        }
-
-        // ======= НАВИГАЦИЯ =======
-        function initNavigation() {
-            const tabs = document.querySelectorAll('.bottom-nav button');
-            tabs.
-
-Сергей Исаев, [31.08.2026 16:55]
-forEach(tab => {
-                tab.addEventListener('click', function() {
-                    // Убрать активные
-                    tabs.forEach(t => t.classList.remove('active'));
-                    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-                    // Активировать текущую
-                    this.classList.add('active');
-                    const screenId = this.dataset.screen;
-                    document.getElementById(screenId).classList.add('active');
-                });
-            });
-        }
-
-        // ======= SOS =======
-        function initSOS() {
-            document.getElementById('sosBtn').addEventListener('click', function() {
-                if (confirm('Отправить сигнал SOS с вашими координатами?')) {
-                    alert('Сигнал отправлен! Спасатели свяжутся с вами.');
-                }
-            });
-        }
-
-        // ======= МЕНЮ (гамбургер) =======
-        function initMenu() {
-            document.getElementById('menuBtn').addEventListener('click', function() {
-                alert('📋 Меню: здесь будут слои карты, закладки, настройки и справка.');
-            });
-        }
-
-        // ======= ЗАПУСК =======
-        document.addEventListener('DOMContentLoaded', function() {
-            renderRoute();
-            renderActivities();
-            updatePassport();
-            initNavigation();
-            initSOS();
-            initMenu();
+<!-- Регистрация Service Worker (для PWA) -->
+<script>
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => console.log('SW зарегистрирован'))
+                .catch(err => console.error('Ошибка SW:', err));
         });
-    </script>
+    }
+</script>
+
 </body>
 </html>
